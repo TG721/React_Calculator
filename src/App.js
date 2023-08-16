@@ -8,18 +8,18 @@ let secondNumber = null;
 let operation = null;
 
 function App() {
-  const [screenValueBottom, setScreenValueBottom] = useState(0);
+  const [screenValueBottom, setScreenValueBottom] = useState("0");
   const [screenValueTop, setScreenValueTop] = useState("");
 
   const typeNumber = (value) => {
     if (operation != null || screenValueTop == "")
       setScreenValueBottom((prevScreenValueBottom) =>
-      prevScreenValueBottom == "0" ? value : prevScreenValueBottom + value
+        prevScreenValueBottom == "0" ? value : prevScreenValueBottom + value
       );
     else {
       clearData();
       setScreenValueBottom((prevScreenValueBottom) =>
-      prevScreenValueBottom == "0" ? value : prevScreenValueBottom + value
+        prevScreenValueBottom == "0" ? value : prevScreenValueBottom + value
       );
     }
   };
@@ -52,7 +52,7 @@ function App() {
   };
 
   const negation = () => {
-    if (screenValueBottom != "0")
+    if (screenValueBottom != "0" && screenValueBottom != "")
       setScreenValueBottom((prevScreenValueBottom) =>
         prevScreenValueBottom.charAt(0) == "-"
           ? prevScreenValueBottom.substring(1, prevScreenValueBottom.length)
@@ -61,11 +61,41 @@ function App() {
   };
 
   const handleDotClick = () => {
-    if (!screenValueBottom.includes(".")){
-      setScreenValueBottom((prevScreenValueBottom) => `${prevScreenValueBottom}.`
-    );
+    if (!screenValueBottom.includes(".")) {
+      setScreenValueBottom(
+        (prevScreenValueBottom) => `${prevScreenValueBottom}.`
+      );
     }
-  }
+  };
+
+  const divideOneBy = () => {
+    if (screenValueTop == "" && screenValueBottom != "") {
+      if (screenValueBottom != "0") {
+        firstNumber = 1 / parseFloat(screenValueBottom)
+        setScreenValueTop(firstNumber);
+        setScreenValueBottom("");
+      }
+    }
+
+    if (screenValueTop != "" && screenValueBottom == "") {
+      if (screenValueTop != "0") {
+        firstNumber = 1 / parseFloat(screenValueTop)
+        setScreenValueTop(firstNumber);
+      }
+    }
+  };
+
+  const squaring = () => {
+    if (screenValueTop == "" && screenValueBottom != "") {
+      firstNumber = screenValueBottom * screenValueBottom
+      setScreenValueTop(firstNumber);
+      setScreenValueBottom("");
+    }
+    if (screenValueTop != "" && screenValueBottom == "") {
+      firstNumber = screenValueTop * screenValueTop
+      setScreenValueTop(firstNumber)
+    }
+  };
 
   const handleOperatorClick = (operator) => {
     switch (operator) {
@@ -78,27 +108,28 @@ function App() {
           operation = operator;
           setScreenValueTop(`${screenValueBottom} ${operator}`);
           setScreenValueBottom("");
-          console.log(firstNumber);
+          // console.log(firstNumber);
         } else if (screenValueBottom != "") {
           secondNumber = screenValueBottom;
-          console.log(secondNumber);
+          // console.log(secondNumber);
           const answer = computeExpression();
-          console.log(answer);
+          // console.log(answer);
           setScreenValueTop(`${answer} ${operator}`);
           setScreenValueBottom("");
           firstNumber = answer;
           secondNumber = null;
           operation = operator;
         } else {
+          // console.log(firstNumber)
           setScreenValueTop(`${firstNumber} ${operator}`);
           operation = operator;
         }
         break;
       case "=": {
         secondNumber = screenValueBottom;
-        console.log(secondNumber);
+        // console.log(secondNumber);
         const answer = computeExpression();
-        console.log(answer);
+        // console.log(answer);
         setScreenValueTop(answer);
         setScreenValueBottom("");
         firstNumber = answer;
@@ -120,8 +151,16 @@ function App() {
         <span>{screenValueBottom}</span>
       </div>
       <div className="Keyboard">
-        <Button className="Button Button--operator" value={"x²"} />
-        <Button className="Button Button--operator" value={"1/x"} />
+        <Button
+          onClick={() => squaring()}
+          className="Button Button--operator"
+          value={"x²"}
+        />
+        <Button
+          onClick={() => divideOneBy()}
+          className="Button Button--operator"
+          value={"1/x"}
+        />
         <Button
           onClick={() => clearData()}
           className="Button Button--operator"
@@ -202,7 +241,13 @@ function App() {
           className="Button Button--number"
           value={0}
         />
-        <Button  onClick={() => { handleDotClick() }} className="Button Button--number" value={"."} />
+        <Button
+          onClick={() => {
+            handleDotClick();
+          }}
+          className="Button Button--number"
+          value={"."}
+        />
         <Button
           onClick={() => handleOperatorClick("=")}
           className="Button Button--operator"
